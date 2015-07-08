@@ -1,23 +1,18 @@
 package za.co.entelect.forums.java.example;
 
-import za.co.entelect.forums.java.example.domain.Car;
-import za.co.entelect.forums.java.example.domain.Gantry;
-import za.co.entelect.forums.java.example.domain.Truck;
-import za.co.entelect.forums.java.example.domain.Vehicle;
+import za.co.entelect.forums.java.example.domain.*;
 
-import java.awt.*;
 import java.util.*;
-import java.util.List;
 
 public class App {
 
-    private static Car carA = new Car(4, 4, 200, Color.BLACK, "ASD123GP");
-    private static Car carB = new Car(4, 2, 250, Color.CYAN, "SDF234GP");
-    private static Car carC = new Car(4, 4, 200, Color.BLACK, "YUI678GP");
-    private static Truck truckA = new Truck(6, 2, 120, Color.BLUE, 4, "CVB456GP");
-    private static Truck truckB = new Truck(18, 2, 400, Color.RED, 100, "ERT234GP");
-    private static Truck truckC = new Truck(10, 2, 120, Color.GREEN, 3, "BNM678GP");
-    private static Truck truckD = new Truck(6, 2, 120, Color.BLUE, 4, "WER345GP");
+    private static Car carA = new Car(4, 4, 200, Color.Black, "ASD123GP");
+    private static Car carB = new Car(4, 2, 250, Color.Cyan, "SDF234GP");
+    private static Car carC = new Car(4, 4, 200, Color.Black, "YUI678GP");
+    private static Truck truckA = new Truck(6, 2, 120, Color.Blue, 4, "CVB456GP");
+    private static Truck truckB = new Truck(18, 2, 400, Color.Red, 100, "ERT234GP");
+    private static Truck truckC = new Truck(10, 2, 120, Color.Green, 3, "BNM678GP");
+    private static Truck truckD = new Truck(6, 2, 120, Color.Blue, 4, "WER345GP");
 
     public static void main( String[] args ) {
 
@@ -47,7 +42,7 @@ public class App {
     }
 
     public static Set<Vehicle> getVehicleSet() {
-        Set<Vehicle> vehicles = new HashSet<Vehicle>();
+        Set<Vehicle> vehicles = new HashSet<>();
         vehicles.add(new Car(carA));
         vehicles.add(new Car(carB));
         vehicles.add(new Car(carC));
@@ -60,7 +55,7 @@ public class App {
     }
 
     public static List<Vehicle> getVehicleList() {
-        List<Vehicle> vehicles = new ArrayList<Vehicle>();
+        List<Vehicle> vehicles = new ArrayList<>();
         vehicles.add(new Car(carA));
         vehicles.add(new Car(carB));
         vehicles.add(new Car(carC));
@@ -73,7 +68,7 @@ public class App {
     }
 
     public static Map<String, Vehicle> getVehicleMap() {
-        Map<String, Vehicle> vehicles = new HashMap<String, Vehicle>();
+        Map<String, Vehicle> vehicles = new HashMap<>();
         vehicles.put("carA", new Car(carA));
         vehicles.put("carB", new Car(carB));
         vehicles.put("carC", new Car(carC));
@@ -86,7 +81,7 @@ public class App {
     }
 
     public static Deque<Vehicle> getVehicleQueue() {
-        Deque<Vehicle> vehicles = new ArrayDeque<Vehicle>();
+        Deque<Vehicle> vehicles = new ArrayDeque<>();
         vehicles.add(new Car(carA));
         vehicles.add(new Car(carB));
         vehicles.add(new Car(carC));
@@ -99,7 +94,7 @@ public class App {
     }
 
     public static List<Gantry> getGantryList() {
-        List<Gantry> gantries = new ArrayList<Gantry>();
+        List<Gantry> gantries = new ArrayList<>();
         gantries.add(getGantryA());
         gantries.add(getGantryB());
         gantries.add(getGantryC());
@@ -122,7 +117,7 @@ public class App {
         Random random = new Random(seed);
         Gantry gantry = new Gantry(name, cost);
         List<Vehicle> vehicles = getVehicleList();
-        List<Vehicle> vehiclesSpotted = new ArrayList<Vehicle>();
+        List<Vehicle> vehiclesSpotted = new ArrayList<>();
 
         for (int i = 0; i < quantity; i++) {
             vehiclesSpotted.add(vehicles.get(random.nextInt(vehicles.size())));

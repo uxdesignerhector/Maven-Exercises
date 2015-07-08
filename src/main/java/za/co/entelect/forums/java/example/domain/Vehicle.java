@@ -1,7 +1,5 @@
 package za.co.entelect.forums.java.example.domain;
 
-import java.awt.*;
-
 public abstract class Vehicle implements VehicleOperations {
 
     private int numberOfWheels;
