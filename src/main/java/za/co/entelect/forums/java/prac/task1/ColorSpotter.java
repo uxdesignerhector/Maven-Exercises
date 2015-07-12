@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public class ColourSpotter {
+public class ColorSpotter {
 
     /*
         Given a Gantry, generate a map that groups the vehicles by colour.
