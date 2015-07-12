@@ -45,4 +45,6 @@ Once you have this properly configured your build should succeed:
 [INFO] ------------------------------------------------------------------------
 ```
 
+You can run one of the examples with: `java -cp target/maven-exercises-1.0.0-SNAPSHOT.jar za.co.entelect.forums.java.prac.task1.ColorSpotter`.
+
 Answer: `git checkout answer1` 
