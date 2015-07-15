@@ -207,3 +207,303 @@ Then update your `pom.xml` to use `junit:4.12` and use your IDE to add the missi
 Now run `mvn clean test` to make sure your changes are working.  
 
 Answer: `git checkout answer3`
+
+## Exercise 4: Multi-module Web Project
+
+Exercise: `git checkout exercise4`
+
+### Step 1: Domain module
+
+As your final exercise, let's convert the project into a multi-module web project. The overall structure of the new
+version will be as follows:
+```
+ maven-exercises
+   \_ domain: All the current code in the project will move into the domain.
+   \_ web: Web module will contain a single controller and page that will show the output of the corruption exercise.
+```
+
+First edit your current project's `pom.xml`:
+ * Change `<groupId>` value to `za.co.entelect.forums.java.maven.exercises`.
+ * Change `<packaging>` value to `pom`.
+
+Now you can generate your domain module using the simple project archetype:
+```
+mvn -B archetype:generate \
+      -DarchetypeGroupId=org.apache.maven.archetypes \
+      -DgroupId=za.co.entelect.forums.java.maven.exercises \
+      -DartifactId=domain
+```
+
+Now make the following changes to the generated module's `pom.xml`:
+ * Remove the redundant `<groupId>` (inherited from parent project).
+ * Update the version to `1.0.0-SNAPSHOT` to be consistent with the parent project.
+ * Add `<packaging>jar</packaging>`.
+ * Remove `<version>` from your JUnit dependency.
+
+Now move the code from `src/main/java/` and `src/test/java` in your parent project into the new module.
+
+Now make the following changes to your parent `pom.xml`:
+ * Wrap the existing `<dependencies>` element in a `<dependencyManagement>` element.
+ * Delete the src folder from the parent module.
+
+Finally run `mvn clean install` - if all went well your domain module should build and its test should run.
+
+### Step 2: Web module
+
+Begin by generating your web module:
+```
+mvn archetype:generate \
+    -DgroupId=za.co.entelect.forums.java.maven.exercises \
+    -DartifactId=web \
+    -DarchetypeArtifactId=maven-archetype-webapp \
+    -DinteractiveMode=false
+```
+
+Now make the following changes to the generated module's `pom.xml`:
+ * Remove the redundant `<groupId>` (inherited from parent project).
+ * Update the version to `1.0.0-SNAPSHOT` to be consistent with the parent project.
+ * Remove `<version>` from your JUnit dependency.
+
+Edit your generated `web.xml` to upgrade to servlet 3.0:
+```
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+         version="3.0">
+
+    <display-name>Corruption Web Application</display-name>
+</web-app>
+```
+
+Add the following properties to your `web/pom.xml`:
+```
+    <properties>
+		<spring.version>4.1.1.RELEASE</spring.version>
+		<jstl.version>1.2</jstl.version>
+		<logback.version>1.0.13</logback.version>
+		<jcl-over-slf4j.version>1.7.5</jcl-over-slf4j.version>
+	</properties>
+```
+
+Add the following dependencies to your `web/pom.xml`:
+```
+    <dependency>
+        <groupId>za.co.entelect.forums.java.maven.exercises</groupId>
+        <artifactId>domain</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </dependency>
+    
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-core</artifactId>
+        <version>${spring.version}</version>
+        <exclusions>
+            <exclusion>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging</artifactId>
+            </exclusion>
+        </exclusions>
+    </dependency>
+
+    <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>jcl-over-slf4j</artifactId>
+        <version>${jcl-over-slf4j.version}</version>
+    </dependency>
+
+    <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>${logback.version}</version>
+    </dependency>
+
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-web</artifactId>
+        <version>${spring.version}</version>
+    </dependency>
+
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-webmvc</artifactId>
+        <version>${spring.version}</version>
+    </dependency>
+
+    <!-- jstl -->
+    <dependency>
+        <groupId>jstl</groupId>
+        <artifactId>jstl</artifactId>
+        <version>${jstl.version}</version>
+    </dependency>
+```
+
+Add the following build plugin to your `web/pom.xml` to use to run the web application:
+```
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat7-maven-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+                    <path>/corruption</path>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+```
+
+Add a Spring controller `web/src/main/java/za/co/entelect/forums/java/maven/web/BaseController.java`:
+```java
+package za.co.entelect.forums.java.maven.web;
+
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import za.co.entelect.forums.java.example.App;
+import za.co.entelect.forums.java.example.domain.Gantry;
+import za.co.entelect.forums.java.example.domain.Vehicle;
+
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@Controller
+public class BaseController {
+
+    private static final String VIEW_INDEX = "index";
+    private final static org.slf4j.Logger logger = LoggerFactory.getLogger(BaseController.class);
+
+    @RequestMapping(value = "/", method = RequestMethod.GET)
+    public String welcome(ModelMap model) {
+        Map<Vehicle, BigDecimal> vehicleBills = getVehicleBills();
+
+        model.addAttribute("vehicles", vehicleBills.keySet());
+        model.addAttribute("bills", vehicleBills);
+        logger.debug("Showing vehicle bills : " + vehicleBills.toString());
+
+        // Spring uses InternalResourceViewResolver and return back index.jsp
+        return VIEW_INDEX;
+    }
+
+    private Map<Vehicle, BigDecimal> getVehicleBills() {
+        List<Gantry> gantries = App.getGantryList();
+        Map<Vehicle, BigDecimal> vehicleBill = new HashMap<>();
+
+        for (Gantry gantry : gantries) {
+            for (Vehicle vehicle : gantry.getVehicles()) {
+                if (!vehicleBill.containsKey(vehicle)) {
+                    vehicleBill.put(vehicle, new BigDecimal(gantry.getToll()));
+                } else {
+                    BigDecimal value = vehicleBill.get(vehicle);
+                    vehicleBill.put(vehicle, value.add(new BigDecimal(gantry.getToll())));
+                }
+            }
+        }
+
+        return vehicleBill;
+    }
+}
+```
+
+Add a Spring configuration file `WEB-INF/mvc-dispatcher-servlet.xml`:
+```
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans     
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context.xsd">
+ 
+	<context:component-scan base-package="za.co.entelect.forums.java.maven.web" />
+ 
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix">
+			<value>/WEB-INF/pages/</value>
+		</property>
+		<property name="suffix">
+			<value>.jsp</value>
+		</property>
+	</bean>
+</beans>
+```
+
+Add Spring `web.xml` configuration:
+```
+    <servlet>
+		<servlet-name>mvc-dispatcher</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+ 
+	<servlet-mapping>
+		<servlet-name>mvc-dispatcher</servlet-name>
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+ 
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>/WEB-INF/mvc-dispatcher-servlet.xml</param-value>
+	</context-param>
+ 
+	<listener>
+		<listener-class>
+           org.springframework.web.context.ContextLoaderListener
+        </listener-class>
+	</listener>
+```
+
+Move `index.jsp` to `WEB-INF/pages` and give it some useful content:
+```
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<html>
+<body>
+<h1>Corruption Bills</h1>
+
+<c:forEach var="vehicle" items="${vehicles}">
+    <h2>Vehicle : ${vehicle.registrationNumber}</h2>
+    <p>Bill: R ${bills[vehicle]}</p>
+</c:forEach>
+</body>
+</html>
+
+```
+
+Create `web/src/main/resources/logback.xml`:
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+
+            <Pattern>
+                %d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n
+            </Pattern>
+
+        </layout>
+    </appender>
+
+    <logger name="za.co.entelect.forums.java.maven.web" level="debug"
+            additivity="false">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <root level="debug">
+        <appender-ref ref="STDOUT"/>
+    </root>
+</configuration>
+```
+
+If all went well you should now be able to build and run your web application:
+ * `mvn clean install`
+ * `mvn tomcat:run`
+ * Then visit: http://locahost:8080/web/
+
+Exercise: `git checkout answer4`
