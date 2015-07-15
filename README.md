@@ -154,3 +154,56 @@ Downloaded: http://esjavatools:8080/artifactory/libs-release/com/badlogicgames/g
 Note how Maven now downloads the artefacts from your repository manager, greatly speeding up the build.
 
 Answer: `git checkout answer2`
+
+## Exercise 3: Tests
+
+Exercise: `git checkout exercise3`
+
+Your example project includes some tests (OK - a test). To run it, execute `mvn clean test` and look at the output:
+```
+...
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+Running za.co.entelect.forums.java.AppTest
+Woohoo - tests!
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.01 sec
+
+Results :
+
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 3.880 s
+...
+```
+
+If you examine your project there are some important things to note:
+ * You are using `junit:3.8.1` for tests (that's *ancient*).
+ * Your test file is named `AppTest.java`.
+
+If you were to rename `AppTest.java` to `App.java` and rerun `mvn clean test` you'll see that tests are no longer
+executed - this is because the Maven Surefire plugin by default only looks for tests in files matching the following
+patterns:
+ * `**/Test*.java`
+ * `**/*Test.java`
+ * `**/*TestCase.java`
+
+Junit 3 is the default included in the project dependencies when you use an archetype to generate a Maven project, but
+it's ancient and version 4's syntax is much more concise - let's upgrade our project to the latest version of JUnit
+(`junit:4.12`).
+
+Make the following changes to the test file `AppTest.java`:
+ * Remove all import statements.
+ * Remove `extends TestCase` from the class definition.
+ * Remove the constructor.
+ * Remove the static method `suite`.
+ * Replace `assertTrue(true);` with `Assert.assertTrue(true);`.
+
+Then update your `pom.xml` to use `junit:4.12` and use your IDE to add the missing imports in test `App.java`.
+
+Now run `mvn clean test` to make sure your changes are working.  
+
+Answer: `git checkout answer3`
