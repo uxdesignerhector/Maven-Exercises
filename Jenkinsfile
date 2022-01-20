@@ -3,6 +3,8 @@ pipeline {
   stages {
     stage('Building ') {
       steps {
+        echo 'Comienzo del stage'
+        sh 'git checkout answer3'
         sh 'mvn clean install -Dlicense.skip=true'
         echo 'Corriendo Maven'
       }
@@ -10,7 +12,7 @@ pipeline {
 
     stage('Mensaje final') {
       steps {
-        echo 'Finalización'
+        echo 'FinalizaciÃ³n'
       }
     }
 
