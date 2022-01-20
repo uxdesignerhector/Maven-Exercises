@@ -5,14 +5,14 @@ pipeline {
       steps {
         echo 'Comienzo del stage'
         sh 'git checkout answer3'
-        sh 'mvn clean install -Dlicense.skip=true'
         echo 'Corriendo Maven'
+        sh 'mvn clean install -Dlicense.skip=true'
       }
     }
 
     stage('Mensaje final') {
       steps {
-        echo 'Finalización'
+        echo 'Finalizacion'
       }
     }
 
